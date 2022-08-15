@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Silly Office</title>
+    <!-- import alpine and rivet  Still deciphering why two rivet sources-->
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <link href="https://unpkg.com/rivet-core@2.0.0-alpha.3/css/rivet.min.css" rel="stylesheet">
+    <link href="https://unpkg.com/rivet-core@2.0.0/css/rivet.min.css" rel="stylesheet">
+    <link href="/css/styles.css" rel="stylesheet">
+    <link href="/css/microsite.css" rel="stylesheet">
+    <style>
+        .hidden{
+            display: none;
+        }
+        .rvt-profile__img{
+            position: relative;
+            left: 40px;
+            /* transform: scale(50%); */
+            animation: scaleSilly 2s forwards ease-in-out;
+        }
+        @keyframes scaleSilly {
+            from{
+                transform: scale(100%);
+            }
+            to{
+                transform: scale(85%) rotateY(360deg) rotateZ(360deg);
+            }
+        }
+        .flair-grad_red {
+            background: linear-gradient(310deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 24%, rgba(218, 163, 163, 1) 52%, rgba(255, 255, 255, 1) 61%, rgba(153, 0, 0, 1) 68%, rgba(153, 0, 0, 1) 71%, rgba(224, 179, 179, 1) 80%, rgba(255, 255, 255, 1) 90%, rgba(255, 255, 255, 1) 100%);
+            background-size: 400%;
+            animation: move 2s forwards ease-in-out;
+        }
+
+        @keyframes move {
+            from {
+                background-position: -400px;
+            }
+
+            to {
+                background-position: 0px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    
+    <div id="template" class="hidden rvt-row rvt-justify-space-between rvt-p-left-md rvt-p-right-md">
+        <div x-data="{open: true}" class="flair-grad_red rvt-border-radius rvt-cols-3-lg rvt-profile__intro rvt-shadow-heavy rvt-m-all-md">
+            <div class="rvt-profile__img rvt-avatar rvt-avatar--xl rvt-m-all-xs">
+                <img alt="Headshot of Chris Tompkins"
+                     class="rvt-avatar__image" 
+                     src="https://prevention.iu.edu/experts/photos/melsheimer.jpg"
+                     @click="open =! open"
+                     >
+            </div>
+            <div x-show="open" class="rvt-profile__details">
+                <span class="rvt-profile__name rvt-strong rvt-ts-20">
+                    David Melsheimer
+                </span>
+                <span class="rvt-m-top-xxs rvt-color-black-500">
+                    <em class="rvt-m-top-xs rvt-ts-14">
+                        Web Developer
+                    </em>
+                </span>
+            </div>
+        </div>
+        
+    </div>
+    <script src="images/imageTokens.js"></script>
+
+    <script>
+        function componentFactoryByBruteForce(inputData){
+            let div1 = document.createElement('div');
+            div1.classList.add("rvt-row", "rvt-justify-space-between", "rvt-p-left-md", "rvt-p-right-md");
+            console.log(div1);
+
+            let div2 = document.createElement('div');
+            div2.classList.add("flair-grad_red", "rvt-border-radius", 
+                               "rvt-cols-3-lg", "rvt-profile__intro", 
+                               "rvt-shadow-heavy", "rvt-m-all-md");
+            div2.setAttribute('x-data', '{open: true}');
+
+            let div3 = document.createElement('div');
+            div3.classList.add("rvt-profile__img", "rvt-avatar", "rvt-avatar--xl", "rvt-m-all-xs");
+
+            let img1 = document.createElement('img');
+            img1.classList.add('rvt-avatar__image');
+            img1.setAttribute('src', inputData.src);
+            // img1.createAttribute('@click');
+            // img1.setAttribute('@click', 'open != open');
+
+            //ok, this has to end
+            div1.appendChild(div2);
+            div2.appendChild(div3);
+            div3.appendChild(img1);
+            document.body.appendChild(div1);
+        }
+
+        (function generateTeam(){
+            imageTokens.map( member => {
+                // componentFactoryByBruteForce({src: `images/${member}.jpg`});
+                componentFactoryByCopy({src: `images/${member}.jpg`, member});
+            });
+        })();
+
+        function componentFactoryByCopy(inputData){
+            let templateComponent = document.getElementById('template');
+            let clonedTemplate = templateComponent.cloneNode(true);
+            templateComponent.classList.remove('hidden');
+            let nameElement = templateComponent.querySelector('.rvt-profile__name');
+            nameElement.innerHTML = inputData.member;
+            let imageSrc = templateComponent.querySelector('[src]');
+            imageSrc.setAttribute('src', inputData.src);
+            document.body.appendChild(clonedTemplate);
+        }
+
+    </script>
+</body>
+
+</html>

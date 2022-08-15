@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "puppeteer": "^16.1.0",
+    "unique-names-generator": "^4.7.1"
+  }
+}
