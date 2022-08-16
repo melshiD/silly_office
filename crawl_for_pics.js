@@ -3,6 +3,7 @@
 //within the rvt- ecosystem
 const puppeteer = require('puppeteer');
 const fs = require('fs');
+const { title } = require('process');
 const url = process.argv[2];
 
 const employeeObjects = {};
@@ -44,22 +45,40 @@ async function imagesFromRequests(){
 async function getElementsFromPage(elementToken = '.person', srcUrl = 'https://www.prevention.iu.edu/experts'){
   let browser = await puppeteer.launch();
   let page = await browser.newPage();
-  await page.goto(srcUrl);
-  return await page.evaluate( () => {
-    return document.querySelectorAll(elementToken);
+  await page.goto(srcUrl);  
+  const empObjs = await page.evaluate( () => {
+    let names = {};
+    let personElements = document.querySelectorAll('.person');
+    personElements.forEach( (person) => {
+      let title = person.querySelector('.title').innerHTML;
+      let imgSrc = person.querySelector('img').getAttribute('src');
+      let details = person.querySelector('.staff-details')
+                    .textContent.split('\n').map( string => string.replace(/(\s\s\s*)/g, ''))
+                    .filter(string => string.replace(/\s/g, '').length);
+      //clean up white space just at outside edges of details?
+      names[title] = {imgSrc, details};
+    });
+    return names;
   });
+  return empObjs;
 };
 
 function subQuery(parent, token){
+  console.log('parent:' + parent);
   return parent.querySelectorAll(token);
 }
 
-async function getElementsAndReturnASubQuery(index = 0){
-  const elements = await getElementsFromPage('.person');
-  let name = subQuery(elements[index], '.title');
-  console.log(name);
+async function getElementsAndBuildJsonObjectOfEmployees(){
+  const elements = await getElementsFromPage();
+  let file = fs.writeFileSync('empObjs.js', `const empObjs = ${JSON.stringify(elements)};`);
 }
 
-getElementsAndReturnASubQuery();
+getElementsAndBuildJsonObjectOfEmployees();
 
 // node .\crawl_for_pics.js https://www.prevention.iu.edu/experts 
+
+
+
+// TO GET DETAILS: people[4].querySelector('.staff-details')
+//   .textContent.split('\n').map( string => string.replace(/(\s\s\s*)/g, ' '))
+//   .filter(string => string.replace(/\s/g, '').length);

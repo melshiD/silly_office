@@ -13,13 +13,17 @@
     <link href="/css/styles.css" rel="stylesheet">
     <link href="/css/microsite.css" rel="stylesheet">
     <style>
+        *{
+            --background-start-pos: -460px;
+            --gradient-one: linear-gradient(310deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 24%, rgba(218, 163, 163, 1) 52%, rgba(255, 255, 255, 1) 61%, rgba(153, 0, 0, 1) 68%, rgba(153, 0, 0, 1) 71%, rgba(224, 179, 179, 1) 80%, rgba(255, 255, 255, 1) 90%, rgba(255, 255, 255, 1) 100%);
+            --gradient-two: linear-gradient(306deg, rgba(255,255,255,1) 0%, rgba(255,255,255,1) 24%, rgba(218,163,163,1) 60%, rgba(255,255,255,1) 61%, rgba(153,0,0,1) 62%, rgba(153,0,0,1) 71%, rgba(224,179,179,1) 72%, rgba(255,255,255,1) 72%, rgba(255,255,255,1) 100%);
+        }
         .hidden{
             display: none;
         }
         .rvt-profile__img{
             position: relative;
             left: 40px;
-            /* transform: scale(50%); */
             animation: scaleSilly 2s forwards ease-in-out;
         }
         @keyframes scaleSilly {
@@ -31,18 +35,25 @@
             }
         }
         .flair-grad_red {
+            background: var(--gradient-two);
+            background-size: 400%;
+            background-position: var(--background-start-pos);
+            /* animation: move 2s forwards ease-in-out; */
+        }
+        /* .flair-grad_red .animate-background{
             background: linear-gradient(310deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 1) 24%, rgba(218, 163, 163, 1) 52%, rgba(255, 255, 255, 1) 61%, rgba(153, 0, 0, 1) 68%, rgba(153, 0, 0, 1) 71%, rgba(224, 179, 179, 1) 80%, rgba(255, 255, 255, 1) 90%, rgba(255, 255, 255, 1) 100%);
             background-size: 400%;
+            background-position: -400px;
             animation: move 2s forwards ease-in-out;
-        }
+        } */
 
         @keyframes move {
             from {
-                background-position: -400px;
+                background-position: var(--background-start-pos);
             }
 
             to {
-                background-position: 0px;
+                background-position: -200px;
             }
         }
     </style>
@@ -72,8 +83,7 @@
         </div>
         
     </div>
-    <script src="images/imageTokens.js"></script>
-
+    <script src="empObjs.js"></script>
     <script>
         function componentFactoryByBruteForce(inputData){
             let div1 = document.createElement('div');
@@ -102,24 +112,46 @@
             document.body.appendChild(div1);
         }
 
+        function componentFactoryByCopy(name, src, details){
+            let clonedTemplate = document.getElementById('template').cloneNode(true);
+            clonedTemplate.classList.remove('hidden');
+            clonedTemplate.setAttribute('person', name);
+            clonedTemplate.removeAttribute('id');
+            let nameElement = clonedTemplate.querySelector('.rvt-profile__name');
+            nameElement.innerHTML = name;
+            let imageSrc = clonedTemplate.querySelector('[src]');
+            imageSrc.setAttribute('src', src);
+            let detailElement = clonedTemplate.querySelector('.rvt-m-top-xs.rvt-ts-14');
+            detailElement.innerHTML = details[1]?details[1]:details[0];
+            document.body.appendChild(clonedTemplate);
+
+            clonedTemplate.children[0].addEventListener('click', (event) => {
+                console.log(event.target.classList)
+                event.target.style.animation = 'move 2s forwards ease-in-out';
+            })
+        }
+        
+
         (function generateTeam(){
-            imageTokens.map( member => {
-                // componentFactoryByBruteForce({src: `images/${member}.jpg`});
-                componentFactoryByCopy({src: `images/${member}.jpg`, member});
+            Object.keys(empObjs).map( member => {
+                componentFactoryByCopy(member, empObjs[member].imgSrc, empObjs[member].details);
             });
         })();
 
-        function componentFactoryByCopy(inputData){
-            let templateComponent = document.getElementById('template');
-            let clonedTemplate = templateComponent.cloneNode(true);
-            templateComponent.classList.remove('hidden');
-            let nameElement = templateComponent.querySelector('.rvt-profile__name');
-            nameElement.innerHTML = inputData.member;
-            let imageSrc = templateComponent.querySelector('[src]');
-            imageSrc.setAttribute('src', inputData.src);
-            document.body.appendChild(clonedTemplate);
+        function callFactoryWithSingleEntry(member){
+            componentFactoryByCopy(member, empObjs[member].imgSrc, empObjs[member].details);
         }
 
+        const observer = new IntersectionObserver( entries => {
+            entries.forEach( entry => {
+                entry.target.classList.toggle('show', entry.isIntersecting);
+            })
+        });
+
+        const people = document.querySelectorAll('[person]');
+        people.forEach( person => {
+            observer.observe(person);
+        })
     </script>
 </body>
 
