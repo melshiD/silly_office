@@ -1,0 +1,2 @@
+git ls-tree -r main --name-only   (list tracked files)
+git rm -r --cached photos/        (remove 'photos' directory after being tracked (before push))
