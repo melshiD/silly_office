@@ -166,11 +166,12 @@
             </div>
         </div>
     </header>
+    <input type="range" id="range" min="-800" max="0" step="1" value="-400" />
     <div id="template" class="hidden rvt-row rvt-justify-space-between rvt-p-left-md rvt-p-right-md">
         <div x-data="{open: true}" class="flair-grad_red rvt-border-radius rvt-cols-3-lg rvt-profile__intro rvt-shadow-heavy rvt-m-all-md">
             <div class="rvt-profile__img rvt-avatar rvt-avatar--xl rvt-m-all-xs">
                 <img alt="Headshot of Chris Tompkins"
-                     class="rvt-avatar__image" 
+                     class="rvt-avatar__image rvt-m-left-4" 
                      src="https://prevention.iu.edu/experts/photos/melsheimer.jpg"
                      @click="open =! open"
                      >
@@ -257,6 +258,16 @@
         people.forEach( person => {
             observer.observe(person);
         })
+
+        let range = document.getElementById('range');
+        let targets = document.querySelectorAll('[x-data]');
+        range.addEventListener('input', (e) => {
+            console.log(e.target.value)
+            targets.forEach( item => {
+                item.style.backgroundPosition = `${e.target.value}px`;
+            })
+        })
+
     </script>
 </body>
 
